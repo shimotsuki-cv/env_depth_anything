@@ -1,0 +1,28 @@
+services:
+  sample:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+      args:
+        - PIPENV_PYTHON_VERSION=3.10
+    image: sample/torch
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:ro
+      - ../../data:/home/user/data
+    command: >
+      bash -c " source /home/user/entrypoint.sh && /bin/bash "
+    environment:
+      - USER_ID=1000    # 自分のユーザID
+      - GROUP_ID=1000   # 自分のグループID
+      - DISPLAY=$DISPLAY
+    ports:
+      - 7860:7860       # gradioが使うポート番号
+    shm_size: '16gb'
+    stdin_open: true
+    tty: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [ gpu ]
